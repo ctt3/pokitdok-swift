@@ -26,6 +26,8 @@ class Pokitdok: NSObject {
         let url_base = base_path + "/api/" + version
         let token_url = base_path + "/oauth2/token"
         let auth_url = base_path + "/oauth2/authorize"
+        let scope = scope
+        let auto_refresh = auto_refresh
 
         fetch_access_token()
     }
@@ -119,13 +121,37 @@ class Pokitdok: NSObject {
         task.resume()
     }
 
-    // *********
-    func post(path: String, params: Dictionary<String, AnyObject>? = nil) {
-        request(path, "POST", params){ (success: Bool, json: AnyObject?)
-            return json
-        }
+    func get(path: String, params: Dictionary<String, AnyObject>? = nil) {
+        /*
+            Convenience GET type method
+        */
+
+        return request(path, "GET", params)
     }
-    // *********
+    
+    func put(path: String, params: Dictionary<String, AnyObject>? = nil) {
+        /*
+            Convenience PUT type method
+        */
+
+        return request(path, "PUT", params)
+    }
+    
+    func post(path: String, params: Dictionary<String, AnyObject>? = nil) {
+        /*
+            Convenience POST type method
+        */
+
+        return request(path, "POST", params)
+    }
+    
+    func delete(path: String, params: Dictionary<String, AnyObject>? = nil) {
+        /*
+            Convenience DELETE type method
+        */
+
+        return request(path, "DELETE", params)
+    }
     
     func activities(activity_id: String?, activities_request: AnyObject?){
         /*
