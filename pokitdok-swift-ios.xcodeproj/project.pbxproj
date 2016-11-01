@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D240A061DC3CE8300D4C7E2 /* pokitdok-swift-ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D2409FC1DC3CE8300D4C7E2 /* pokitdok-swift-ios.framework */; };
+		1D240A061DC3CE8300D4C7E2 /* Pokitdok.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */; };
 		1D240A0B1DC3CE8300D4C7E2 /* pokitdok_swift_iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D240A0A1DC3CE8300D4C7E2 /* pokitdok_swift_iosTests.swift */; };
 		1D240A0D1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1D240A171DC3CF5600D4C7E2 /* Pokitdok.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D240A161DC3CF5600D4C7E2 /* Pokitdok.swift */; };
@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1D2409FC1DC3CE8300D4C7E2 /* pokitdok-swift-ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "pokitdok-swift-ios.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pokitdok.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pokitdok-swift-ios.h"; sourceTree = "<group>"; };
 		1D240A001DC3CE8300D4C7E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1D240A051DC3CE8300D4C7E2 /* pokitdok-swift-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "pokitdok-swift-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,7 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D240A061DC3CE8300D4C7E2 /* pokitdok-swift-ios.framework in Frameworks */,
+				1D240A061DC3CE8300D4C7E2 /* Pokitdok.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +65,7 @@
 		1D2409FD1DC3CE8300D4C7E2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D2409FC1DC3CE8300D4C7E2 /* pokitdok-swift-ios.framework */,
+				1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */,
 				1D240A051DC3CE8300D4C7E2 /* pokitdok-swift-iosTests.xctest */,
 			);
 			name = Products;
@@ -118,7 +118,7 @@
 			);
 			name = "pokitdok-swift-ios";
 			productName = "pokitdok-swift-ios";
-			productReference = 1D2409FC1DC3CE8300D4C7E2 /* pokitdok-swift-ios.framework */;
+			productReference = 1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		1D240A041DC3CE8300D4C7E2 /* pokitdok-swift-iosTests */ = {
@@ -335,7 +335,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "pokitdok.pokitdok-swift-ios";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Pokitdok;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -355,7 +355,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "pokitdok.pokitdok-swift-ios";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Pokitdok;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
 			};
@@ -404,6 +404,7 @@
 				1D240A121DC3CE8300D4C7E2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1D240A131DC3CE8300D4C7E2 /* Build configuration list for PBXNativeTarget "pokitdok-swift-iosTests" */ = {
 			isa = XCConfigurationList;
@@ -412,6 +413,7 @@
 				1D240A151DC3CE8300D4C7E2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

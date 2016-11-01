@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import pokitdok_swift_ios
+@testable import Pokitdok
 
 class pokitdok_swift_iosTests: XCTestCase {
     
