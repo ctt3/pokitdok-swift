@@ -24,6 +24,12 @@ class pokitdok_swift_iosTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let client_id = "9P10N4H2F7ZbaAU6RYct"
+        let client_secret = "gOFzgJiIUoqnUhjaZezDxUf7ugPF6FsRAPy2tWDT"
+        let base = "http://localhost:5002"
+        var client = Pokitdok(clientId: client_id, clientSecret: client_secret, basePath: base, autoRefresh: true)
+        
+        client.icdConvert(code: "556.9")
     }
     
     func testPerformanceExample() {
