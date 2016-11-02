@@ -25,7 +25,7 @@
 
 /* Begin PBXFileReference section */
 		1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pokitdok.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pokitdok-swift-ios.h"; sourceTree = "<group>"; };
+		1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "pokitdok-swift-ios.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		1D240A001DC3CE8300D4C7E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1D240A051DC3CE8300D4C7E2 /* pokitdok-swift-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "pokitdok-swift-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D240A0A1DC3CE8300D4C7E2 /* pokitdok_swift_iosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pokitdok_swift_iosTests.swift; sourceTree = "<group>"; };
