@@ -29,12 +29,12 @@ class pokitdok_swift_iosTests: XCTestCase {
         let base = "http://localhost:5002"
         let client = Pokitdok(clientId: client_id, clientSecret: client_secret, basePath: base, autoRefresh: true)
         
-//        let response = client.icdConvert(code: "556.9")
-//        print("RESPONSE FROM ICD: \(response)")
+        let response = client.icdConvert(code: "556.9")
+        print("RESPONSE FROM ICD: \(response)")
 
-//        let cash_args = ["zip_code" : "29485", "cpt_code" : "99385"]
-//        let cash_response = client.cashPrices(cashPricesRequest: cash_args)
-//        print("RESPONSE FROM CLIENT: \(cash_response)")
+        let cash_args = ["zip_code" : "29485", "cpt_code" : "99385"]
+        let cash_response = client.cashPrices(cashPricesRequest: cash_args)
+        print("RESPONSE FROM CLIENT: \(cash_response)")
         
         let elig_args = ["member": [
                             "birth_date" : "1970-01-25",

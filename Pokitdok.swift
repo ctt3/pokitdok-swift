@@ -9,27 +9,7 @@
 import UIKit
 import Foundation
 
-extension Dictionary {
-//    func toJSONString() -> String {
-//        // WORK ON THIS
-//        var pcs = [String]()
-//        for (key, val) in self {
-//            var valStr = ""
-//            if let val = val as? String {
-//                valStr = "\"\(val)\""
-//            } else if let val = val as? Dictionary<String, AnyObject> {
-//                valStr = val.toJSONString() // recursion for nested dictionaries
-//            } else if let val = val as? Array<String> {
-//                let tmpStr = val.joined(separator: "\",\"")
-//                valStr = "[\"\(tmpStr)\"]"
-//            } else if let val = val as? NSNumber {
-//                valStr = "\(val)"
-//            }
-//            pcs.append("\"\(key)\":\(valStr)")
-//        }
-//        return "{" + pcs.joined(separator: ",") + "}"
-//    }
-    
+extension Dictionary {    
     func toParamString() -> String {
         // WORK ON THIS
         var pcs = [String]()
