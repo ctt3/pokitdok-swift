@@ -35,7 +35,7 @@ public class PokitdokRequest: NSObject {
         buildRequestBody(path: path, params: params, file_paths: file_paths)
     }
     
-    func call() -> PokitdokResponse{
+    func call() -> PokitdokResponse {
         /*
             Send the request off and return result
         */
@@ -80,23 +80,18 @@ public class PokitdokRequest: NSObject {
         let contentType = getHeader(key: "Content-Type")
         if let params = params {
             if requestObject.httpMethod == "GET" {
-                let paramString = buildParamString(params: params)
-                print(paramString)
-                requestObject.url = NSURL(string: "\(path)?\(paramString)")! as URL
+                setPath(path: "\(getPath())?\(buildParamString(params: params))")
             } else {
                 if contentType == "application/json" {
                     requestObject.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
-                    print(String(data: requestObject.httpBody!, encoding: String.Encoding.utf8) ?? "")
                 } else if contentType == "application/x-www-form-urlencoded" {
-                    let paramString = buildParamString(params: params)
-                    print(paramString)
-                    requestObject.httpBody = paramString.data(using: .utf8)
+                    requestObject.httpBody = buildParamString(params: params).data(using: .utf8)
                 }
             }
         }
     }
     
-    private func buildParamString(params: Dictionary<String, Any>) -> String{
+    private func buildParamString(params: Dictionary<String, Any>) -> String {
         /*
             Create a url safe parameter string based on a dictionary of key:values
             WORK ON THIS SHIT
@@ -146,7 +141,7 @@ public class PokitdokRequest: NSObject {
         return requestObject.url?.absoluteString
     }
 
-    func setPath(path: String) {
+    func setPath(path: String){
         requestObject.url = NSURL(string: path)! as URL
     }
 }

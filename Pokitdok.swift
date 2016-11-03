@@ -67,6 +67,7 @@ class Pokitdok: NSObject {
         if tokenResponse.success == true {
             self.accessToken = tokenResponse.json?["access_token"] as! String?
         } else {
+            // raise here
             print("Failed to fetch token")
         }
     }
