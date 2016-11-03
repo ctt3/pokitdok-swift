@@ -18,93 +18,79 @@ public struct PokitdokResponse {
 }
 
 public class PokitdokRequest: NSObject {
-    
-    var requestObject: URLRequest? = nil
-    var responseObject: PokitdokResponse? = nil
+
+    var requestObject: URLRequest
+    var responseObject: PokitdokResponse
     
     init(path: String, method: String = "GET", headers: Dictionary<String, String>? = nil, params: Dictionary<String, Any>? = nil, file_paths: Array<String>? = nil){
         /*
-         Make http call
-         */
-        super.init()
+            Initialize requestObject variables
+        */
         requestObject = URLRequest(url: NSURL(string: path)! as URL)
-        requestObject!.httpMethod = method
+        responseObject = PokitdokResponse()
+        super.init()
+
+        requestObject.httpMethod = method
         buildRequestHeaders(headers: headers)
         buildRequestBody(path: path, params: params, file_paths: file_paths)
     }
     
     func call() -> PokitdokResponse{
         /*
-         Send the request off and return result
-         */
-        if requestObject != nil {
-            let sema = DispatchSemaphore( value: 0 ) // make it real time sync
-            let task = URLSession.shared.dataTask(with: requestObject!, completionHandler: { (data, response, error) -> Void in
-                self.responseObject = PokitdokResponse(success: false, response: response, data: data, error: error, json: nil, message: nil)
+            Send the request off and return result
+        */
+        let sema = DispatchSemaphore( value: 0 ) // make it real time sync
+        let task = URLSession.shared.dataTask(with: requestObject, completionHandler: { (data, response, error) -> Void in
+            self.responseObject.response = response
+            self.responseObject.data = data
+            self.responseObject.error = error
                 
-                if let data = data {
-                    // wrap catch
-                    self.responseObject?.json = try! JSONSerialization.jsonObject(with: data, options: []) as! Dictionary<String, Any>
+            if let data = data {
+                // wrap catch
+                self.responseObject.json = try! JSONSerialization.jsonObject(with: data, options: []) as! Dictionary<String, Any>
+            }
+            if let response = response as? HTTPURLResponse {
+                if 200...299 ~= response.statusCode {
+                    self.responseObject.success = true
+                } else if 401 ~= response.statusCode {
+                    self.responseObject.message = "TOKEN_EXPIRED"
                 }
-                if let response = response as? HTTPURLResponse {
-                    if 200...299 ~= response.statusCode {
-                        self.responseObject?.success = true
-                    } else if 401 ~= response.statusCode {
-                        self.responseObject?.message = "TOKEN_EXPIRED"
-                    }
-                }
-                sema.signal()
-            })
-            task.resume()
-            sema.wait()
-        }
-        return self.responseObject ?? PokitdokResponse()
-    }
-    
-    func getHeader(key: String) -> String? {
-        if let request = requestObject {
-            return request.value(forHTTPHeaderField: key)
-        } else {
-            return nil
-        }
-    }
-    
-    func setHeader(key: String, value: String){
-        requestObject!.setValue(value, forHTTPHeaderField: key)
+            }
+            sema.signal()
+        })
+        task.resume()
+        sema.wait()
+        return responseObject
     }
     
     private func buildRequestHeaders(headers: Dictionary<String, String>? = nil){
         /*
-         Set the header values on the request
-         */
-        if requestObject != nil {
-            if let headers = headers {
-                for (key, value) in headers { setHeader(key: key, value: value) }
-            }
+            Set the header values on the request
+        */
+        if let headers = headers {
+            for (key, value) in headers { setHeader(key: key, value: value) }
         }
     }
     
     private func buildRequestBody(path: String, params: Dictionary<String, Any>? = nil, file_paths: Array<String>? = nil){
         /*
-         Create the body of the request
-         WORK ON THIS SHIT TO INCLUDE FILES
-         */
-        if requestObject != nil {
-            let contentType = requestObject!.value(forHTTPHeaderField: "Content-Type")
-            if let params = params {
-                if requestObject!.httpMethod == "GET" {
+            Create the body of the request
+            WORK ON THIS SHIT TO INCLUDE FILE TRANSMISSION
+        */
+        let contentType = getHeader(key: "Content-Type")
+        if let params = params {
+            if requestObject.httpMethod == "GET" {
+                let paramString = buildParamString(params: params)
+                print(paramString)
+                requestObject.url = NSURL(string: "\(path)?\(paramString)")! as URL
+            } else {
+                if contentType == "application/json" {
+                    requestObject.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
+                    print(String(data: requestObject.httpBody!, encoding: String.Encoding.utf8) ?? "")
+                } else if contentType == "application/x-www-form-urlencoded" {
                     let paramString = buildParamString(params: params)
                     print(paramString)
-                    requestObject!.url = NSURL(string: "\(path)?\(paramString)")! as URL
-                } else {
-                    if contentType == "application/json" {
-                        requestObject!.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
-                        print(String(data: requestObject!.httpBody!, encoding: String.Encoding.utf8) ?? "")
-                    } else if contentType == "application/x-www-form-urlencoded" {
-                        let paramString = buildParamString(params: params)
-                        print(paramString)
-                        requestObject!.httpBody = paramString.data(using: .utf8)
-                    }
+                    requestObject.httpBody = paramString.data(using: .utf8)
                 }
             }
         }
@@ -112,9 +98,9 @@ public class PokitdokRequest: NSObject {
     
     private func buildParamString(params: Dictionary<String, Any>) -> String{
         /*
-         Create a url safe parameter string based on a dictionary of key:values
-         WORK ON THIS SHIT
-         */
+            Create a url safe parameter string based on a dictionary of key:values
+            WORK ON THIS SHIT
+        */
         var pcs = [String]()
         for (key, value) in params {
             var valStr = ""
@@ -130,5 +116,37 @@ public class PokitdokRequest: NSObject {
             pcs.append("\(escapedKey ?? "")=\(escapedValue ?? "")")
         }
         return pcs.joined(separator: "&")
+    }
+    
+    func getHeader(key: String) -> String? {
+        /*
+            Enables user to manipulate headers from outside the class
+            return the header at the key from the requestObject
+        */
+        return requestObject.value(forHTTPHeaderField: key)
+    }
+    
+    func setHeader(key: String, value: String){
+        /*
+            Enables user to manipulate headers from outside the class
+            set the header to the key: value pair
+        */
+        requestObject.setValue(value, forHTTPHeaderField: key)
+    }
+    
+    func getMethod() -> String? {
+        return requestObject.httpMethod
+    }
+
+    func setMethod(method: String){
+        requestObject.httpMethod = method
+    }
+
+    func getPath() -> String? {
+        return requestObject.url?.absoluteString
+    }
+
+    func setPath(path: String) {
+        requestObject.url = NSURL(string: path)! as URL
     }
 }
