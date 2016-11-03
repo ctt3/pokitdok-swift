@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D1857BC1DCBD5F4005D573B /* PokitdokRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1857BB1DCBD5F4005D573B /* PokitdokRequest.swift */; };
 		1D240A061DC3CE8300D4C7E2 /* Pokitdok.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */; };
 		1D240A0B1DC3CE8300D4C7E2 /* pokitdok_swift_iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D240A0A1DC3CE8300D4C7E2 /* pokitdok_swift_iosTests.swift */; };
 		1D240A0D1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -24,6 +25,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1D1857BB1DCBD5F4005D573B /* PokitdokRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PokitdokRequest.swift; sourceTree = "<group>"; };
 		1D2409FC1DC3CE8300D4C7E2 /* Pokitdok.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pokitdok.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "pokitdok-swift-ios.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		1D240A001DC3CE8300D4C7E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			children = (
 				1D2409FF1DC3CE8300D4C7E2 /* pokitdok-swift-ios.h */,
 				1D240A001DC3CE8300D4C7E2 /* Info.plist */,
+				1D1857BB1DCBD5F4005D573B /* PokitdokRequest.swift */,
 			);
 			path = "pokitdok-swift-ios";
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D240A171DC3CF5600D4C7E2 /* Pokitdok.swift in Sources */,
+				1D1857BC1DCBD5F4005D573B /* PokitdokRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

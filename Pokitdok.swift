@@ -6,57 +6,32 @@
 //  Copyright © 2016 Charlie Thiry. All rights reserved.
 //
 
-import UIKit
 import Foundation
 
-extension Dictionary {    
-    func toParamString() -> String {
-        // WORK ON THIS
-        var pcs = [String]()
-        for (key, value) in self {
-            var valStr = ""
-            if let value = value as? String {
-                valStr = value
-            } else if let value = value as? Dictionary<String, AnyObject> {
-                valStr = value.toParamString()
-            } else if let value = value as? Array<String> {
-                valStr = value.joined(separator: ",")
-            }
-            let escapedKey = (key as! String).addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed)
-            let escapedValue = valStr.addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed)
-            pcs.append("\(escapedKey ?? "")=\(escapedValue ?? "")")
-        }
-        return pcs.joined(separator: "&")
-    }
-}
 
 class Pokitdok: NSObject {
     /*
         Swift client to send requests to Pokitdok Platform APIs
     */
-    
-    struct PokitdokResponse {
-        var success: Bool? = false
-        var response: URLResponse? = nil
-        var data: Data? = nil
-        var error: Error? = nil
-        var json: Dictionary<String, Any>? = nil
-    }
 
     let username: String
     let password: String
     let urlBase: String
     let tokenUrl: String
     let authUrl: String
+    let redirectURI: String?
     let desiredScope: String?
     let autoRefreshToken: Bool
+    let tokenCallback: String?
+    let authCode: String?
 
     var accessToken: String? = nil
-    var pdResponse: PokitdokResponse? = nil
     
     let test_url = "http://localhost:5002/swift-test"
 
-    init(clientId: String, clientSecret: String, basePath: String = "https://platform.pokitdok.com", version: String = "v4", scope: String? = nil, autoRefresh: Bool = false){
+    init(clientId: String, clientSecret: String, basePath: String = "https://platform.pokitdok.com", version: String = "v4",
+         redirectUri: String? = nil, scope: String? = nil, autoRefresh: Bool = false, tokenRefreshCallback: String? = nil,
+         code: String? = nil, token: String? = nil){
         /*
             Initialize necessary variables
         */
@@ -66,8 +41,12 @@ class Pokitdok: NSObject {
         urlBase = basePath + "/api/" + version
         tokenUrl = basePath + "/oauth2/token"
         authUrl = basePath + "/oauth2/authorize"
+        redirectURI = redirectUri
         desiredScope = scope
         autoRefreshToken = autoRefresh
+        tokenCallback = tokenRefreshCallback
+        authCode = code
+        accessToken = token
 
         super.init()
         fetchAccessToken()
@@ -83,102 +62,34 @@ class Pokitdok: NSObject {
         let headers = ["Authorization" : "Basic \(encodedIdSecret ?? "")", "Content-Type" : "application/x-www-form-urlencoded"] as Dictionary<String, String>
         let params = ["grant_type" : "client_credentials"] as Dictionary<String, Any>
 
-        let request = prepareRequest(path: tokenUrl, method: "POST", headers: headers, params: params)
-        let response = makeRequest(request: request)
+        let tokenResponse = PokitdokRequest(path: tokenUrl, method: "POST", headers: headers, params: params).call()
 
-        if response.success == true {
-            self.accessToken = response.json?["access_token"] as! String?
+        if tokenResponse.success == true {
+            self.accessToken = tokenResponse.json?["access_token"] as! String?
         } else {
             print("Failed to fetch token")
         }
     }
     
-    func request(path: String, method: String = "GET", params: Dictionary<String, Any>? = nil, files: [AnyObject?]? = nil) -> Dictionary<String, Any> {
+    func request(path: String, method: String = "GET", params: Dictionary<String, Any>? = nil, file_paths: Array<String>? = nil) -> Dictionary<String, Any> {
         /*
             General method for submitting an API request
         */
         
         let requestUrl = urlBase + path
-        var request = prepareRequest(path: requestUrl, method: method, params: params, files: files)
-        var response = makeRequest(request: request)
-        
-        if autoRefreshToken, response.success == false, response.json?["errors"] as! String == "TOKEN_EXPIRED" {
+        var headers = ["Content-Type": "application/json"]
+        headers["Authorization"] = "Bearer \(accessToken ?? "")"
+
+        let requestObject = PokitdokRequest(path: requestUrl, method: method, headers: headers, params: params, file_paths: file_paths)
+        var responseObject = requestObject.call()
+
+        if autoRefreshToken, responseObject.success == false, responseObject.message == "TOKEN_EXPIRED" {
             fetchAccessToken()
-            request = prepareRequest(path: requestUrl, method: method, params: params, files: files)
-            response = makeRequest(request: request)
+            requestObject.setHeader(key: "Authorization", value: "Bearer \(accessToken ?? "")")
+            responseObject = requestObject.call()
         }
 
-        return response.json ?? [:]
-    }
-    
-    private func prepareRequest(path: String, method: String = "GET", headers: Dictionary<String, String>? = nil,
-                                params: Dictionary<String, Any>? = nil, files: [AnyObject?]? = nil) -> URLRequest{
-        /*
-            Create URLRequest Object (package up request data into object)
-        */
-        var request = URLRequest(url: NSURL(string: path)! as URL)
-        request.httpMethod = method
-
-        var request_headers: Dictionary<String, String>
-        if headers != nil {
-            request_headers = headers!
-            if request_headers["Content-Type"] == nil { request_headers["Content-Type"] = "application/json" }
-        } else {
-            request_headers = ["Authorization" : "Bearer \(accessToken ?? "")", "Content-Type" : "application/json"] as Dictionary<String, String>
-        }
-        let contentType = request_headers["Content-Type"]
-        for (key, value) in request_headers { request.setValue(value, forHTTPHeaderField: key) }
-
-        if let params = params {
-            if method == "GET" {
-                let paramString = params.toParamString()
-                print(paramString)
-                request.url = NSURL(string: "\(path)?\(paramString)")! as URL
-            } else {
-                if contentType == "application/json" {
-                  request.httpBody = try? JSONSerialization.data(withJSONObject: params, options: [])
-                  print(String(data: request.httpBody!, encoding: String.Encoding.utf8) ?? "")
-
-//                    let paramString = params.toJSONString()
-//                    print(paramString)
-//                    request.httpBody = paramString.data(using: .utf8)
-                } else if contentType == "application/x-www-form-urlencoded" {
-                    let paramString = params.toParamString()
-                    print(paramString)
-                    request.httpBody = paramString.data(using: .utf8)
-                }
-            }
-        }
-
-        return request
-    }
-
-    private func makeRequest(request: URLRequest) -> PokitdokResponse {
-        /*
-            Send the request off and return result
-        */
-        let sema = DispatchSemaphore( value: 0 ) // make it real time sync
-        let task = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
-            self.pdResponse = PokitdokResponse(success: false, response: response, data: data, error: error, json: nil)
-
-            if let data = data {
-                // wrap catch
-                self.pdResponse?.json = try! JSONSerialization.jsonObject(with: data, options: []) as! Dictionary<String, Any>
-            }
-            if let response = response as? HTTPURLResponse {
-                if 200...299 ~= response.statusCode {
-                    self.pdResponse?.success = true
-                }
-            }
-            sema.signal()
-        })
-        task.resume()
-        sema.wait()
-        
-        let response = PokitdokResponse(success: pdResponse?.success, response: pdResponse?.response,
-                                        data: pdResponse?.data, error: pdResponse?.error, json: pdResponse?.json)
-        self.pdResponse = nil
-        return response
+        return responseObject.json ?? [:]
     }
 
     func get(path: String, params: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
@@ -223,14 +134,26 @@ class Pokitdok: NSObject {
 
         return request(path: path, method: method, params: activitiesRequest)
     }
+    
+    func authorizations(authorizationsRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
+        /*
+            Submit an authorization request
+        */
+        
+        let path = "/authorizations/"
+        let method = "POST"
+        
+        return request(path: path, method: method, params: authorizationsRequest)
+    }
 
-    func cashPrices(cashPricesRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
+    func cashPrices(cptCode: String, zipCode: String) -> Dictionary<String, Any> {
         /*
             Fetch cash price information
         */
 
         let path = "/prices/cash"
         let method = "GET"
+        let cashPricesRequest = ["cpt_code": cptCode, "zip_code" : zipCode]
 
         return request(path: path, method: method, params: cashPricesRequest)
     }
@@ -268,104 +191,128 @@ class Pokitdok: NSObject {
         return request(path: path, method: method, params: claimsStatusRequest)
     }
 
-    func mpc(code: String? = nil, mpcRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
-        /*
-            Access clinical and consumer friendly information related to medical procedures
-        */
-
-        let path = "/mpc/\(code ?? "")"
-        let method = "GET"
-        
-        return request(path: path, method: method, params: mpcRequest)
-    }
-
-    func icdConvert(code: String) -> Dictionary<String, Any> {
-        /*
-            Locate the appropriate diagnosis mapping for the specified ICD-9 code
-        */
-
-        let path = "/icd/convert/\(code)"
-        let method = "GET"
-        
-        return request(path: path, method: method)
-    }
-
-    func claimsConvert(x12ClaimsFile: AnyObject) -> Dictionary<String, Any> {
+    func claimsConvert(x12ClaimsFilePath: String) -> Dictionary<String, Any> {
         /*
             Submit a raw X12 837 file to convert to a claims API request and map any ICD-9 codes to ICD-10
         */
 
         let path = "/claims/convert"
         let method = "POST"
-        
-        return request(path: path, method: method, files: [x12ClaimsFile])
+
+        return request(path: path, method: method, file_paths: [x12ClaimsFilePath])
     }
 
     func eligibility(eligibilityRequest: Dictionary<String, Any>) -> Dictionary<String, Any> {
         /*
-            Submit an eligibility request
-        */
-
+         Submit an eligibility request
+         */
+        
         let path = "/eligibility/"
         let method = "POST"
         
         return request(path: path, method: method, params: eligibilityRequest)
     }
-
+    
     func enrollment(enrollmentRequest: Dictionary<String, Any>) -> Dictionary<String, Any> {
         /*
-            Submit a benefits enrollment/maintenance request
-        */
-
+         Submit a benefits enrollment/maintenance request
+         */
+        
         let path = "/enrollment"
         let method = "POST"
         
         return request(path: path, method: method, params: enrollmentRequest)
     }
-
-    func enrollmentSnapshot(tradingPartnerId: String, x12File: AnyObject) -> Dictionary<String, Any> {
+    
+    func enrollmentSnapshot(tradingPartnerId: String, x12FilePath: String) -> Dictionary<String, Any> {
         /*
-            Submit a X12 834 file to the platform to establish the enrollment information within it
-            as the current membership enrollment snapshot for a trading partner
-        */
-
+         Submit a X12 834 file to the platform to establish the enrollment information within it
+         as the current membership enrollment snapshot for a trading partner
+         */
+        
         let path = "/enrollment/snapshot"
         let method = "POST"
         
-        return request(path: path, method: method, files: [x12File])
+        return request(path: path, method: method, file_paths: [x12FilePath])
     }
-
+    
     func enrollmentSnapshots(snapshotId: String? = nil, snapshotsRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
         /*
-            List enrollment snapshots that are stored for the client application
-        */
-
+         List enrollment snapshots that are stored for the client application
+         */
+        
         let path = "/enrollment/snapshot/\(snapshotId ?? "")"
         let method = "GET"
         
         return request(path: path, method: method, params: snapshotsRequest)
     }
-
+    
     func enrollmentSnapshotData(snapshotId: String) -> Dictionary<String, Any> {
         /*
-            List enrollment request objects that make up the specified enrollment snapshot
-        */
-
+         List enrollment request objects that make up the specified enrollment snapshot
+         */
+        
         let path = "/enrollment/snapshot/\(snapshotId)/data"
         let method = "GET"
         
         return request(path: path, method: method)
     }
+    
+    func icdConvert(code: String) -> Dictionary<String, Any> {
+        /*
+         Locate the appropriate diagnosis mapping for the specified ICD-9 code
+         */
+        
+        let path = "/icd/convert/\(code)"
+        let method = "GET"
+        
+        return request(path: path, method: method)
+    }
 
-    func insurancePrices(insurancePricesRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
+    func insurancePrices(cptCode: String, zipCode: String) -> Dictionary<String, Any> {
         /*
             Fetch insurance price information
         */
 
         let path = "/prices/insurance"
         let method = "GET"
+        let insurancePricesRequest = ["cpt_code": cptCode, "zip_code" : zipCode]
         
         return request(path: path, method: method, params: insurancePricesRequest)
+    }
+    
+    func mpc(code: String? = nil, name: String? = nil, description: String? = nil) -> Dictionary<String, Any> {
+        /*
+         Access clinical and consumer friendly information related to medical procedures
+         */
+        
+        let path = "/mpc/\(code ?? "")"
+        let method = "GET"
+        var mpcRequest: [String: String] = [:]
+        if let name = name { mpcRequest["name"] = name }
+        if let description = description { mpcRequest["description"] = description }
+        
+        return request(path: path, method: method, params: mpcRequest)
+    }
+    
+    func oopLoadPrice(oopLoadPriceRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
+        /*
+            Load pricing data to OOP endpoint
+        */
+        let path = "/oop/insurance-load-price"
+        let method = "POST"
+        
+        return request(path: path, method: method, params: oopLoadPriceRequest)
+    }
+    
+    func oopEstimate(oopEstimateRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
+        /*
+            Fetch OOP estimate
+        */
+        let path = "/oop/insurance-estimate"
+        let method = "POST"
+        
+        return request(path: path, method: method, params: oopEstimateRequest)
     }
 
     func payers(payersRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
@@ -421,17 +368,6 @@ class Pokitdok: NSObject {
         let method = "POST"
         
         return request(path: path, method: method, params: referralRequest)
-    }
-
-    func authorizations(authorizationsRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
-        /*
-            Submit an authorization request
-        */
-
-        let path = "/authorizations/"
-        let method = "POST"
-        
-        return request(path: path, method: method, params: authorizationsRequest)
     }
 
     func schedulers(schedulerUuid: String? = nil) -> Dictionary<String, Any> {
