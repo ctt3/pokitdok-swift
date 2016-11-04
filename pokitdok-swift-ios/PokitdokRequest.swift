@@ -13,7 +13,7 @@ import Foundation
 
 public struct PokitdokResponse {
     /*
-        struct to hold response information
+        Struct to hold response information
         :VAR success: Bool? type true or false success of the request
         :VAR response: URLResponse? type response object from server
         :VAR data: Data? type data of the response
@@ -32,10 +32,10 @@ public struct PokitdokResponse {
 public class PokitdokRequest: NSObject {
     /*
         Class to facilitate a single HTTP request and the resulting response
+        Capable of packaging and transmitting all necessary parameters of the request and translating a JSON response back from the server
+
         :VAR requestObject: URLRequest type object used to hold all request transmission information
         :VAR responseObject: PokitdokResponse type object used to hold response information
-
-        Capable of packaging and transmitting all necessary parameters of the request and translating a JSON response back from the server
     */
 
     var requestObject: URLRequest
