@@ -29,36 +29,36 @@ class pokitdok_swift_iosTests: XCTestCase {
         let base = "http://localhost:5002"
         let client = Pokitdok(clientId: client_id, clientSecret: client_secret, basePath: base, autoRefresh: true)
         
-//        let response = client.icdConvert(code: "556.9")
-//        print("RESPONSE FROM ICD: \(response)")
+        let sched_response = client.icdConvert(code: "556.9")
+        print("RESPONSE FROM ICD: \(sched_response)")
 
-//        let cash_response = client.cashPrices(cptCode: "99385", zipCode: "29485")
-//        print("RESPONSE FROM CASH PRICES: \(cash_response)")
+        let cash_response = client.cashPrices(cptCode: "99385", zipCode: "29485")
+        print("RESPONSE FROM CASH PRICES: \(cash_response)")
 
-//        let elig_args = ["member": [
-//                            "birth_date" : "1970-01-25",
-//                            "first_name" : "Jane",
-//                            "last_name" : "Doe",
-//                            "id": "W000000000"],
-//                         "provider": [
-//                            "first_name" : "JEROME",
-//                            "last_name" : "AYA-AY",
-//                            "npi" : "1467560003"],
-//                         "trading_partner_id": "MOCKPAYER"] as [String : Any]
-//        let elig_response = client.eligibility(eligibilityRequest: elig_args)
-//        print("RESPONSE FROM ELIGIBILITY: \(elig_response)")
+        let elig_args = ["member": [
+                            "birth_date" : "1970-01-25",
+                            "first_name" : "Jane",
+                            "last_name" : "Doe",
+                            "id": "W000000000"],
+                         "provider": [
+                            "first_name" : "JEROME",
+                            "last_name" : "AYA-AY",
+                            "npi" : "1467560003"],
+                         "trading_partner_id": "MOCKPAYER"] as [String : Any]
+        let elig_response = client.eligibility(eligibilityRequest: elig_args)
+        print("RESPONSE FROM ELIGIBILITY: \(elig_response)")
     
         let act_response = client.activities(activityId: "581b6a980640fd74df1e86fc")
         print("RESPONSE FROM ACTIVITIES: \(act_response)")
         
-//        let cash_response = client.insurancePrices(cptCode: "99385", zipCode: "29485")
-//        print("RESPONSE FROM INSURANCE PRICES: \(cash_response)")
+        let ins_response = client.insurancePrices(cptCode: "99385", zipCode: "29485")
+        print("RESPONSE FROM INSURANCE PRICES: \(ins_response)")
         
-//        let response = client.mpc(name: "office")
-//        print("RESPONSE FROM MPC: \(response)")
-//        
-//        let response = client.schedulers(schedulerUuid: "725d65a1-517c-49ca-bbd5-1ad6ddc7086a")
-//        print("RESPONSE FROM schedulers: \(response)")
+        let mpc_response = client.mpc(name: "office")
+        print("RESPONSE FROM MPC: \(mpc_response)")
+        
+        let schdlr_response = client.schedulers(schedulerUuid: "725d65a1-517c-49ca-bbd5-1ad6ddc7086a")
+        print("RESPONSE FROM schedulers: \(schdlr_response)")
 
         let price_load_args = ["trading_partner_id": "MOCKPAYER",
                                "cpt_bundle": ["99999", "81291"],
@@ -70,11 +70,9 @@ class pokitdok_swift_iosTests: XCTestCase {
                                                           "id": "999999999"]]] as [String : Any]
         let oop_response = client.oopEstimate(oopEstimateRequest: price_load_args)
         print("RESPONSE FROM loadprice: \(oop_response)")
-        print(oop_response["data"])
-        print((oop_response["data"] as! [String: Any])["calculation"])
 
-        let tp_response = client.tradingPartners()
-        print("RESPONSE FROM providers: \(tp_response)")
+        let es_response = client.enrollmentSnapshot(tradingPartnerId: "MOCKPAYER", x12FilePath: "/Users/charliethiry/SuperPack/ohp/tests/data/v4/x12/membership/acme_inc_add_subscriber_child_hmo.834")
+        print("RESPONSE FROM providers: \(es_response)")
     }
         
     func testPerformanceExample() {

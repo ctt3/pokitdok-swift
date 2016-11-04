@@ -1,9 +1,12 @@
 //
-//  Pokitdok.swift
-//  pokitdok-swift-ios
+//  APIRequest.swift
+//  pokitdok-swift
 //
-//  Created by Charlie Thiry on 10/28/16.
-//  Copyright © 2016 Charlie Thiry. All rights reserved.
+// Copyright (C) 2016, All Rights Reserved, PokitDok, Inc.
+// https://www.pokitdok.com
+//
+// Please see the License.txt file for more information.
+// All other rights reserved.
 //
 
 import Foundation
@@ -72,7 +75,7 @@ class Pokitdok: NSObject {
         }
     }
     
-    func request(path: String, method: String = "GET", params: Dictionary<String, Any>? = nil, file_paths: Array<String>? = nil) -> Dictionary<String, Any> {
+    func request(path: String, method: String = "GET", params: Dictionary<String, Any>? = nil, files: Array<FileData>? = nil) -> Dictionary<String, Any> {
         /*
             General method for submitting an API request
         */
@@ -81,7 +84,7 @@ class Pokitdok: NSObject {
         var headers = ["Content-Type": "application/json"]
         headers["Authorization"] = "Bearer \(accessToken ?? "")"
 
-        let requestObject = PokitdokRequest(path: requestUrl, method: method, headers: headers, params: params, file_paths: file_paths)
+        let requestObject = PokitdokRequest(path: requestUrl, method: method, headers: headers, params: params, files: files)
         var responseObject = requestObject.call()
 
         if autoRefreshToken, responseObject.success == false, responseObject.message == "TOKEN_EXPIRED" {
@@ -199,8 +202,9 @@ class Pokitdok: NSObject {
 
         let path = "/claims/convert"
         let method = "POST"
+        let file = FileData(path: x12ClaimsFilePath, contentType: "application/EDI-X12")
 
-        return request(path: path, method: method, file_paths: [x12ClaimsFilePath])
+        return request(path: path, method: method, files: [file])
     }
 
     func eligibility(eligibilityRequest: Dictionary<String, Any>) -> Dictionary<String, Any> {
@@ -233,8 +237,10 @@ class Pokitdok: NSObject {
         
         let path = "/enrollment/snapshot"
         let method = "POST"
+        let params = ["trading_partner_id": tradingPartnerId]
+        let file = FileData(path: x12FilePath, contentType: "application/EDI-X12")
         
-        return request(path: path, method: method, file_paths: [x12FilePath])
+        return request(path: path, method: method, params: params, files: [file])
     }
     
     func enrollmentSnapshots(snapshotId: String? = nil, snapshotsRequest: Dictionary<String, Any>? = nil) -> Dictionary<String, Any> {
