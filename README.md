@@ -11,6 +11,8 @@ Built in Swift 3 to make development using Pokitdok APIs easier and more conveni
 [code]: https://github.com/pokitdok/pokitdok-swift
 [issues]: https://github.com/pokitdok/pokitdok-swift/issues
 
+Be sure not to include your client id and client secret in your app when released.
+
 ## Install
 
 - In a terminal, cd to your project directory, and initialize your project as a git repository (if you have not already):
